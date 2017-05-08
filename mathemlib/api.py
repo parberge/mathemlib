@@ -1,8 +1,8 @@
-import requests
+
 from bs4 import BeautifulSoup
 import yaml
 import logging
-
+import json
 
 log = logging.getLogger(__name__)
 
@@ -24,17 +24,29 @@ class Mathem:
 
     def login(self):
         """
-        A method that login to your account on mathem.se.
+        A method to login to your account on mathem.se.
         The session will be stored in self.session.
         """
         payload = {
-            'username': self.config.get('username'),
-            'Password': self.config.get('password'),
+            'username': self.config['username'],
+            'Password': self.config['password'],
         }
+
         self.session = requests.session()
         response = self.session.post('https://www.mathem.se/Account/logIn', data=payload)
-        if response.status_code != 200:
-            raise Exception('Failed to login')
+
+        try:
+            json_response = response.json()
+        except json.JSONDecodeError:
+            log.debug('Response text: {0}'.format(response.text))
+            log.critical('Login failed')
+            raise
+
+        if json_response.get('Success'):
+            log.info('Login successful')
+        else:
+            log.critical('Login failed')
+            log.debug('Content of response:{0}'.format(json_response))
 
     def get_orders(self, limit=10):
         """
