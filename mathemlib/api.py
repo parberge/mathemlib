@@ -96,4 +96,7 @@ class Mathem:
             if 'Leveransdatum:' in order_list:
                 order_dict['Delivery date'] = order_list[1]
 
+            if 'Planerad leveranstid:' in order_list:
+                order_dict['Expected delivery'] = order_list[1]
+
         return order_dict
