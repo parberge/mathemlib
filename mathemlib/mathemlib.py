@@ -41,7 +41,6 @@ class Mathem:
             log.debug('Response text: {0}'.format(response.text))
             log.critical('Login failed')
             raise
-
         if json_response.get('Success'):
             log.info('Login successful')
         else:

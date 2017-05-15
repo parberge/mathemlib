@@ -1,4 +1,4 @@
-from .api import Mathem
+from .mathemlib import Mathem
 import logging
 
 
