@@ -1,3 +1,8 @@
+# Currently not working
+Since there is no restful api from mathem, this will probably require way to much work.
+For instance, the example below stopped working just a few days after committing the code.
+Right now I'm not spending time on developing this....
+
 # mathemlib
 A python lib for interacting with mathem.se
 
