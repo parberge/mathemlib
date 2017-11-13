@@ -63,7 +63,7 @@ class Mathem:
     def get_orders(self, limit=10):
         """
         :param limit: Stop at this many orders
-        :return: Returns a list of order IDs
+        :return: Returns a dict with order ids as keys
         """
         orders_raw = self.session.get('{0}/min-sida/ordrar'.format(self.mathem_url))
         orders_bs4 = BeautifulSoup(orders_raw.content, 'html.parser')
