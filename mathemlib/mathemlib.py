@@ -27,7 +27,7 @@ class Mathem:
 
         self.session = None
         self.orders = list()
-        self.my_orders_url = 'https://www.mathem.se/min-sida/ordrar'
+        self.mathem_url = 'https://mathem.se'
 
 
     def login(self):
@@ -41,7 +41,7 @@ class Mathem:
         }
 
         self.session = requests.session()
-        response = self.session.post('https://www.mathem.se/Account/logIn', data=payload)
+        response = self.session.post('{0}/Account/LogIn'.format(self.mathem_url), data=payload)
 
         try:
             json_response = response.json()
@@ -55,16 +55,18 @@ class Mathem:
 
         if json_response.get('Success'):
             log.info('Login successful')
+            return 'logged in'
         else:
             log.critical('Login failed')
             log.debug('Content of response:{0}'.format(json_response))
+            raise Exception('Login failed')
 
     def get_orders(self, limit=10):
         """
         :param limit: Stop at this many orders
         :return: Returns a list of order IDs
         """
-        orders_raw = self.session.get(self.my_orders_url)
+        orders_raw = self.session.get('{0}/min-sida/ordrar'.format(self.mathem_url))
         orders_bs4 = BeautifulSoup(orders_raw.content, 'html.parser')
 
         order_ids = list()
