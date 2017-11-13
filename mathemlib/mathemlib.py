@@ -85,31 +85,32 @@ class Mathem:
         :param order_id: The ID of the order to get info from
         :return: A dict with various data about the order
         """
-        order_raw = self.session.get(
-            '{url}/{order_id}'.format(url=self.my_orders_url, order_id=order_id)
-        )
-        order_bs4 = BeautifulSoup(order_raw.content, 'html.parser')
-        order_tables = order_bs4.find_all('table')
-        order_rows = order_tables[0].find_all('tr')
-        order_data = list()
-        for row in order_rows:
-            cols = row.find_all('td')
-            cols = [ele.text.strip() for ele in cols]
-            order_data.append([ele for ele in cols if ele])
+        return "Not implemented yet"
+        #order_raw = self.session.get(
+        #    '{url}/{order_id}'.format(url=self.my_orders_url, order_id=order_id)
+        #)
+        #order_bs4 = BeautifulSoup(order_raw.content, 'html.parser')
+        #order_tables = order_bs4.find_all('table')
+        #order_rows = order_tables[0].find_all('tr')
+        #order_data = list()
+        #for row in order_rows:
+        #    cols = row.find_all('td')
+        #    cols = [ele.text.strip() for ele in cols]
+        #    order_data.append([ele for ele in cols if ele])
 
-        order_dict = dict()
-        for order_list in order_data:
-            if 'Status:' in order_list:
-                # The ugliest line in python history
-                order_dict['Status'] = order_list[1].split('\n')[0].rstrip('\r')
+        #order_dict = dict()
+        #for order_list in order_data:
+        #    if 'Status:' in order_list:
+        #        # The ugliest line in python history
+        #        order_dict['Status'] = order_list[1].split('\n')[0].rstrip('\r')
 
-            if 'Orderdatum:' in order_list:
-                order_dict['Order date'] = order_list[1]
+        #    if 'Orderdatum:' in order_list:
+        #        order_dict['Order date'] = order_list[1]
 
-            if 'Leveransdatum:' in order_list:
-                order_dict['Delivery date'] = order_list[1]
+        #    if 'Leveransdatum:' in order_list:
+        #        order_dict['Delivery date'] = order_list[1]
 
-            if 'Planerad leveranstid:' in order_list:
-                order_dict['Expected delivery'] = order_list[1]
+        #    if 'Planerad leveranstid:' in order_list:
+        #        order_dict['Expected delivery'] = order_list[1]
 
-        return order_dict
+        #return order_dict
