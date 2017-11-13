@@ -29,7 +29,6 @@ class Mathem:
         self.orders = list()
         self.mathem_url = 'https://mathem.se'
 
-
     def login(self):
         """
         A method to login to your account on mathem.se.
@@ -69,16 +68,14 @@ class Mathem:
         orders_raw = self.session.get('{0}/min-sida/ordrar'.format(self.mathem_url))
         orders_bs4 = BeautifulSoup(orders_raw.content, 'html.parser')
 
-        order_ids = list()
-        counter = 0
+        order_dict = dict()
         for link in orders_bs4.find_all('a'):
             if link.get('href') and link.get('href').startswith('/min-sida/ordrar/'):
-                order_ids.append(link.get('href').replace('/min-sida/ordrar/', ''))
-                counter += 1
-            if counter >= limit:
+                order_dict[link.get('href').replace('/min-sida/ordrar/', '')] = {}
+            if len(order_dict) >= limit:
                 break
 
-        return order_ids
+        return order_dict
 
     def get_info(self, order_id):
         """
