@@ -9,18 +9,26 @@ log = logging.getLogger(__name__)
 
 class Mathem:
 
-    def __init__(self, config_file):
+    def __init__(self, config_file=None):
         """
         :param config_file: A path to a config file in yaml format.
         See mathemlib_config_example.yaml
         """
 
-        with open(config_file) as f:
-            self.config = yaml.load(f)
+        self.user = str()
+        self.password = str()
+
+        if config_file:
+            with open(config_file) as f:
+                self.config = yaml.load(f)
+            self.user = self.config['username']
+            self.password = self.config['password']
+
 
         self.session = None
         self.orders = list()
         self.my_orders_url = 'https://www.mathem.se/min-sida/ordrar'
+
 
     def login(self):
         """
@@ -28,8 +36,8 @@ class Mathem:
         The session will be stored in self.session.
         """
         payload = {
-            'username': self.config['username'],
-            'Password': self.config['password'],
+            'username': self.user,
+            'Password': self.password,
         }
 
         self.session = requests.session()
@@ -37,10 +45,14 @@ class Mathem:
 
         try:
             json_response = response.json()
-        except json.JSONDecodeError:
+        except ValueError:
             log.debug('Response text: {0}'.format(response.text))
             log.critical('Login failed')
             raise
+        except:
+            log.critical('Unhandled exeception')
+            raise
+
         if json_response.get('Success'):
             log.info('Login successful')
         else:
