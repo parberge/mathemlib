@@ -50,10 +50,10 @@ class Mathem:
                 log.info('Login successful')
                 return response.json()
         except ValueError:
-            if 'Felaktigt användarnamn eller lösenord' in response.content:
+            if 'felaktigt användarnamn eller lösenord' in response.content.lower():
                 log.info('Login failed. Wrong username or password')
                 log.debug('Response content: %s' % response.content)
-                raise LoginError
+                raise LoginError('Wrong user or password')
             else:
                 log.critical('Unhandled exception occurred')
                 raise
