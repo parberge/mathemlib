@@ -1,26 +1,40 @@
-from mathemlib import Mathem
+# coding: utf-8
+from mathemlib import Mathem, LoginError
 import pytest
 import json
 import requests
+import logging
+
+# Disable all logging outputs
+logger = logging.basicConfig(level=logging.disable(logging.CRITICAL))
 
 
-def test_failed_login(httpserver):
+def test_failed_credentials_login(httpserver):
     test = Mathem()
-    json_test = json.dumps({'test': 'test'})
-    httpserver.serve_content(json_test)
+    httpserver.serve_content('Felaktigt användarnamn eller lösenord')
     test.mathem_url = httpserver.url
     assert test.mathem_url.startswith('http://127.0.0.1')
-    with pytest.raises(Exception):
+    with pytest.raises(LoginError):
+        test.login()
+
+
+def test_failed_login_exception(httpserver):
+    test = Mathem()
+    httpserver.serve_content('unexpected response')
+    test.mathem_url = httpserver.url
+    assert test.mathem_url.startswith('http://127.0.0.1')
+    with pytest.raises(ValueError):
         test.login()
 
 
 def test_successful_login(httpserver):
     test = Mathem()
-    json_test = json.dumps({'Success': 1})
-    httpserver.serve_content(json_test)
+    httpserver.serve_content(json.dumps({'Success': True}), code=200)
     test.mathem_url = httpserver.url
     assert test.mathem_url.startswith('http://127.0.0.1')
-    assert test.login() == 'logged in'
+    response = test.login()
+    assert isinstance(response, dict)
+    assert response.get('Success')
 
 
 def test_get_orders(httpserver):
