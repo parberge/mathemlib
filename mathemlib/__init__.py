@@ -1,4 +1,5 @@
 from .mathemlib import Mathem
+from .mathemlib import LoginError
 import logging
 
 
