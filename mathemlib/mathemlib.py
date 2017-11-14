@@ -1,8 +1,8 @@
+# coding: utf-8
 import requests
 from bs4 import BeautifulSoup
 import yaml
 import logging
-import json
 
 log = logging.getLogger(__name__)
 
@@ -15,8 +15,8 @@ class Mathem:
         See mathemlib_config_example.yaml
         """
 
-        self.user = str()
-        self.password = str()
+        self.user = None
+        self.password = None
 
         if config_file:
             with open(config_file) as f:
@@ -24,41 +24,42 @@ class Mathem:
             self.user = self.config['username']
             self.password = self.config['password']
 
-
         self.session = None
         self.orders = list()
-        self.mathem_url = 'https://mathem.se'
+        self.mathem_url = 'https://www.mathem.se'
 
     def login(self):
         """
         A method to login to your account on mathem.se.
         The session will be stored in self.session.
         """
+
         payload = {
-            'username': self.user,
+            'Username': self.user,
             'Password': self.password,
         }
 
         self.session = requests.session()
-        response = self.session.post('{0}/Account/LogIn'.format(self.mathem_url), data=payload)
+        login_url = '{0}/Account/LogIn'.format(self.mathem_url)
+        log.debug('Login URL: %s' % login_url)
+        response = self.session.post(login_url, data=payload)
+        log.debug('Content of response: %s' % response.text)
 
         try:
-            json_response = response.json()
+            if response.json().get('Success'):
+                log.info('Login successful')
+                return response.json()
         except ValueError:
-            log.debug('Response text: {0}'.format(response.text))
-            log.critical('Login failed')
-            raise
-        except:
-            log.critical('Unhandled exeception')
-            raise
-
-        if json_response.get('Success'):
-            log.info('Login successful')
-            return 'logged in'
+            if 'Felaktigt användarnamn eller lösenord' in response.content:
+                log.info('Login failed. Wrong username or password')
+                log.debug('Response content: %s' % response.content)
+                raise LoginError
+            else:
+                log.critical('Unhandled exception occurred')
+                raise
         else:
-            log.critical('Login failed')
-            log.debug('Content of response:{0}'.format(json_response))
-            raise Exception('Login failed')
+            log.critical('Unhandled exception occurred')
+            raise
 
     def get_orders(self, limit=10):
         """
@@ -66,6 +67,7 @@ class Mathem:
         :return: Returns a dict with order ids as keys
         """
         orders_raw = self.session.get('{0}/min-sida/ordrar'.format(self.mathem_url))
+        log.debug('Response of get_orders in raw format: %s' % orders_raw.content)
         orders_bs4 = BeautifulSoup(orders_raw.content, 'html.parser')
 
         order_dict = dict()
@@ -111,3 +113,7 @@ class Mathem:
         #        order_dict['Expected delivery'] = order_list[1]
 
         #return order_dict
+
+
+class LoginError(Exception):
+    pass
